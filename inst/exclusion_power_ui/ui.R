@@ -1,7 +1,7 @@
 library(shiny)
 
 pedigree_tab <- tabPanel(
-  title = 'Pedigrees',
+  title = "Pedigrees",
   fluidRow(
     column(
       width = 6,
@@ -14,11 +14,35 @@ pedigree_tab <- tabPanel(
   )
 )
 
-data_tab <- tabPanel('Data')
+data_tab <- tabPanel(
+  title = "Data",
+  fluidRow(
+    ## Database
+    column(
+      width = 4
+    ),
 
-markers_tab <- tabPanel('Markers')
+    ## Reference data
+    column(
+      width = 4
+    ),
 
-results_tab <- tabPanel('Results')
+    ## Genotyped individuals
+    column(
+      width = 4,
+      checkboxGroupInput(
+        "available_for_genotyping",
+        "Individuals available for genotyping"
+      )
+    )
+  )
+)
+
+markers_tab <- tabPanel(
+  title = "Markers")
+
+results_tab <- tabPanel(
+  title = "Results")
 
 
 shinyUI(fluidPage(

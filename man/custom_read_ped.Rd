@@ -13,7 +13,8 @@ custom_read_ped(filepath)
 a \code{\link[pedtools]{ped}} object or a list of such
 }
 \description{
-Wraps a \code{\link[pedtools]{readPed}} call so that invalid pedigree files don't make shiny crash.
+Wraps a \code{\link[pedtools]{readPed}} call so that invalid pedigree files
+don't make shiny crash.
 }
 \seealso{
 \code{\link[pedtools]{readPed}}

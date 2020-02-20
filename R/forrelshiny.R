@@ -4,6 +4,6 @@
 #' functionality.
 #'
 #' @export
-epGUI = function() {
-  shiny::runApp(system.file('exclusion_power_ui', package='forrelshiny'))
+epGUI <- function() {
+  shiny::runApp(system.file("exclusion_power_ui", package = "forrelshiny"))
 }
