@@ -1,4 +1,5 @@
 library(shiny)
+library(fafreqs)
 
 pedigree_tab <- tabPanel(
   title = "Pedigrees",
@@ -19,7 +20,14 @@ data_tab <- tabPanel(
   fluidRow(
     ## Database
     column(
-      width = 4
+      width = 4,
+      tags$h4("Load frequency database"),
+      fafreqs_widget_input(
+        "frequency_db",
+        allow_marker_filtering = FALSE,
+        allow_scaling = FALSE,
+        allow_rare_allele = FALSE
+      )
     ),
 
     ## Reference data

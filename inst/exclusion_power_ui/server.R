@@ -6,7 +6,9 @@ shinyServer(function(input, output, session) {
   ped_claim <- reactive({
     validate(need(input$ped_claim_file, "Please select a claim pedigree"))
 
-    custom_read_ped(input$ped_claim_file$datapath)
+    p <- custom_read_ped(input$ped_claim_file$datapath)
+
+    custom_ped_set_markers(p, frequency_db())
   })
 
   ped_true <- reactive({
@@ -32,5 +34,14 @@ shinyServer(function(input, output, session) {
       "available_for_genotyping",
       choices = custom_ped_labels(ped_claim())
     )
+  })
+
+  # Load frequency database
+  frequency_db <- reactive({
+    ft <- callModule(fafreqs_widget, "frequency_db")
+
+    if (isTruthy(ft())) {
+      normalise(ft())
+    }
   })
 })

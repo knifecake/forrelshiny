@@ -2,6 +2,7 @@
 
 export(custom_ped_labels)
 export(custom_ped_plot)
+export(custom_ped_set_markers)
 export(custom_read_ped)
 export(epGUI)
 export(get_genotyped_ids)

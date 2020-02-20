@@ -87,3 +87,20 @@ get_genotyped_ids <- function(x) {
 is_genotyped <- function(x, id) {
   any(!is.na(pedtools::getAlleles(x, ids = c(id))))
 }
+
+#' Attach markers metadata to pedigree
+#'
+#' @param x a \code{\link[pedtools]{ped}} object or a list of such
+#' @param freqt a \code{\link[fafreqs]{freqt}} object
+#'
+#' @return the pedigree (or pedList) with the specified markers attached
+#' @export
+custom_ped_set_markers <- function(x, freqt) {
+  if (pedtools::is.pedList(x)) {
+    lapply(x, function (p) {
+      custom_ped_set_markers(p, freqt)
+    })
+  } else {
+    pedtools::setMarkers(x, locusAttributes = fafreqs::to_pedtools(freqt))
+  }
+}
