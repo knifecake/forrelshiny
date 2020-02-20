@@ -16,4 +16,5 @@ Imports:
     forrel,
     shiny,
     gezellig,
-    fafreqs
+    fafreqs,
+    pedtools
