@@ -1,4 +1,5 @@
 library(shiny)
+library(gezellig)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
@@ -8,7 +9,15 @@ shinyServer(function(input, output, session) {
 
     p <- custom_read_ped(input$ped_claim_file$datapath)
 
-    custom_ped_set_markers(p, frequency_db())
+    # attach allele frequencies
+    p <- custom_ped_set_markers(p, frequency_db())
+
+    # update marker settings table
+    update_ti(session, "marker_settings",
+              fields = mst_fields,
+              data = get_marker_settings_table(p))
+
+    p
   })
 
   ped_true <- reactive({
@@ -44,4 +53,17 @@ shinyServer(function(input, output, session) {
       normalise(ft())
     }
   })
+
+  # Marker settings table
+  marker_settings <- reactive({
+    mst <- callModule(ti, "marker_settings", mst_fields, data.frame())
+  })
 })
+
+mst_fields <- list(ti_label("Marker"),
+                   ti_dropdown("Mutations", c("Auto" = "auto",
+                                              "On" = "on",
+                                              "Off" = "off")),
+                   ti_radio("Sex-linked?", c("Autosomal" = 0,
+                                             "X chrom" = 23)),
+                   ti_checkbox("Include in calculation?"))

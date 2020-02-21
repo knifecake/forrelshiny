@@ -1,5 +1,6 @@
 library(shiny)
 library(fafreqs)
+library(gezellig)
 
 pedigree_tab <- tabPanel(
   title = "Pedigrees",
@@ -47,7 +48,13 @@ data_tab <- tabPanel(
 )
 
 markers_tab <- tabPanel(
-  title = "Markers")
+  title = "Markers",
+  fluidRow(
+    column(
+      width = 12,
+      ti_input("marker_settings")
+    )
+  ))
 
 results_tab <- tabPanel(
   title = "Results")
