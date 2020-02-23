@@ -30,6 +30,11 @@ shinyServer(function(input, output, session) {
               fields = mst_fields,
               data = new_mst)
 
+    # attach reference data
+    if (isTruthy(input$familias_reference_file)) {
+      p <- read_familias_case_data(p, input$familias_reference_file$datapath)
+    }
+
     p
   })
 

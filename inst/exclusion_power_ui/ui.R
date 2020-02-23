@@ -22,7 +22,7 @@ data_tab <- tabPanel(
     ## Database
     column(
       width = 4,
-      tags$h4("Load frequency database"),
+      tags$h4("Frequency database"),
       fafreqs_widget_input(
         "frequency_db",
         allow_marker_filtering = FALSE,
@@ -33,7 +33,10 @@ data_tab <- tabPanel(
 
     ## Reference data
     column(
-      width = 4
+      width = 4,
+      tags$h4("Reference data"),
+      fileInput("familias_reference_file",
+                "Load a familias case data file")
     ),
 
     ## Genotyped individuals
