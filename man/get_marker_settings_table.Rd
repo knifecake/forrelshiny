@@ -4,7 +4,13 @@
 \alias{get_marker_settings_table}
 \title{Generate marker settings table from a pedigree}
 \usage{
-get_marker_settings_table(x, included_markers, mutation_settings)
+get_marker_settings_table(
+  x,
+  included_markers,
+  mutation_settings,
+  allele_counts,
+  simulation_threshold
+)
 }
 \arguments{
 \item{x}{a \code{\link[pedtools]{ped}} object or a list of such. If given a
@@ -13,6 +19,10 @@ list it only considers marker data in the first component.}
 \item{included_markers}{a list of markers which will be included in the calculation}
 
 \item{mutation_settings}{a list of mutation models corresponding to each marker}
+
+\item{allele_counts}{a list of the number of alleles that each marker may take}
+
+\item{simulation_threshold}{the number of alleles after which calculations are simulated}
 }
 \value{
 a \code{data.frame} with the columns Marker, Mutations, Sex-linked?

@@ -4,13 +4,15 @@
 #'   list it only considers marker data in the first component.
 #' @param included_markers a list of markers which will be included in the calculation
 #' @param mutation_settings a list of mutation models corresponding to each marker
+#' @param allele_counts a list of the number of alleles that each marker may take
+#' @param simulation_threshold the number of alleles after which calculations are simulated
 #'
 #' @return a \code{data.frame} with the columns Marker, Mutations, Sex-linked?
 #'   and Include in calculation? derived from the marker metadata in the
 #'   pedigree
 #'
 #' @export
-get_marker_settings_table <- function(x, included_markers, mutation_settings) {
+get_marker_settings_table <- function(x, included_markers, mutation_settings, allele_counts, simulation_threshold) {
   if (pedtools::is.pedList(x))
     x = x[[1]]
 
@@ -18,12 +20,20 @@ get_marker_settings_table <- function(x, included_markers, mutation_settings) {
   mutations <- mutation_settings  # replicate(length(markers), "auto")
   sex_linked <- unlist(lapply(x$MARKERS, pedtools::chrom))
   included <- included_markers # replicate(length(markers), TRUE)
+  comments <- unlist(lapply(allele_counts, function(n) {
+    if (n > simulation_threshold) {
+      "Will be simulated."
+    } else {
+      ""
+    }
+  }))
 
   data.frame(
     "Marker" = markers,
     "Mutations" = mutations,
     `Sex-linked?` = sex_linked,
     `Include in calculation?` = included,
+    "Comments" = comments,
     check.names = FALSE
   )
 }

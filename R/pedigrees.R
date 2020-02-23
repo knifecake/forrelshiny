@@ -101,6 +101,6 @@ custom_ped_set_markers <- function(x, freqt) {
       custom_ped_set_markers(p, freqt)
     })
   } else {
-    pedtools::setMarkers(x, locusAttributes = fafreqs::to_pedtools(freqt))
+    pedtools::setMarkers(x, locusAttributes = fafreqs::to_pedtools_locusAttributes(freqt))
   }
 }

@@ -15,6 +15,10 @@ shinyServer(function(input, output, session) {
     # attach marker settings
     included_markers <- get_marker_names(p)
     mutation_settings <- replicate(length(included_markers), "auto")
+    allele_counts <- unlist(lapply(fafreqs::markers(frequency_db()), function(m) {
+      length(fafreqs::alleles(frequency_db(), m))
+    }))
+
     mst <- marker_settings()
     if (isTruthy(mst) && is.data.frame(mst)) {
       p <- apply_marker_settings(p, mst)
@@ -25,7 +29,12 @@ shinyServer(function(input, output, session) {
     }
 
     # update marker settings table
-    new_mst <- get_marker_settings_table(p, included_markers, mutation_settings)
+    new_mst <- get_marker_settings_table(p,
+                                         included_markers,
+                                         mutation_settings,
+                                         allele_counts,
+                                         simulation_threshold())
+
     update_ti(session, "marker_settings",
               fields = mst_fields,
               data = new_mst)
@@ -64,16 +73,19 @@ shinyServer(function(input, output, session) {
   })
 
   # Load frequency database
-  frequency_db <- reactive({
-    ft <- callModule(fafreqs_widget, "frequency_db")
-
-    if (isTruthy(ft())) {
-      normalise(ft())
-    }
-  })
+  frequency_db <- callModule(fafreqs_widget, "frequency_db")
 
   # Marker settings table
   marker_settings <- callModule(ti, "marker_settings", fields = mst_fields, data = data.frame())
+
+  # Simulation threshold
+  simulation_threshold <- reactive({
+    if (isTruthy(input$simulation_threshold) && input$simulation_threshold >= 0) {
+      input$simulation_threshold
+    } else {
+      Inf
+    }
+  })
 })
 
 mst_fields <- list(ti_label("Marker"),
@@ -82,4 +94,5 @@ mst_fields <- list(ti_label("Marker"),
                                               "Off" = "off")),
                    ti_radio("Sex-linked?", c("Autosomal" = "NA",
                                              "X chrom" = "23")),
-                   ti_checkbox("Include in calculation?"))
+                   ti_checkbox("Include in calculation?"),
+                   ti_label("Comments"))

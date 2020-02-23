@@ -59,6 +59,27 @@ markers_tab <- tabPanel(
     )
   ))
 
+settings_tab <- tabPanel(
+  title = "Settings",
+  fluidRow(
+    column(
+      width = 4,
+      tags$h4("Simulation settings"),
+      numericInput("simulation_threshold",
+                   "Simulation threshold",
+                   value = -1,
+                   min = -1,
+                   step = 1),
+      helpText("The exclusion power for markers with more than this many alleles will be obtained by simulation, as opposed to an exact calculation. Enter -1 or leave empty to never simulate."),
+      numericInput("nsims",
+                   "Number of simulations",
+                   value = 10,
+                   min = 1,
+                   step = 1)
+    )
+  )
+)
+
 results_tab <- tabPanel(
   title = "Results")
 
@@ -71,6 +92,7 @@ shinyUI(fluidPage(
         pedigree_tab,
         data_tab,
         markers_tab,
+        settings_tab,
         results_tab
       )
     ),
