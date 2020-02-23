@@ -12,10 +12,23 @@ shinyServer(function(input, output, session) {
     # attach allele frequencies
     p <- custom_ped_set_markers(p, frequency_db())
 
+    # attach marker settings
+    included_markers <- get_marker_names(p)
+    mutation_settings <- replicate(length(included_markers), "auto")
+    mst <- marker_settings()
+    if (isTruthy(mst) && is.data.frame(mst)) {
+      p <- apply_marker_settings(p, mst)
+
+      # save metadata not stored in pedigree for the next update
+      included_markers <- mst[, "Include in calculation?"]
+      mutation_settings <- mst[, "Mutations"]
+    }
+
     # update marker settings table
+    new_mst <- get_marker_settings_table(p, included_markers, mutation_settings)
     update_ti(session, "marker_settings",
               fields = mst_fields,
-              data = get_marker_settings_table(p))
+              data = new_mst)
 
     p
   })
@@ -55,15 +68,13 @@ shinyServer(function(input, output, session) {
   })
 
   # Marker settings table
-  marker_settings <- reactive({
-    mst <- callModule(ti, "marker_settings", mst_fields, data.frame())
-  })
+  marker_settings <- callModule(ti, "marker_settings", fields = mst_fields, data = data.frame())
 })
 
 mst_fields <- list(ti_label("Marker"),
                    ti_dropdown("Mutations", c("Auto" = "auto",
                                               "On" = "on",
                                               "Off" = "off")),
-                   ti_radio("Sex-linked?", c("Autosomal" = 0,
-                                             "X chrom" = 23)),
+                   ti_radio("Sex-linked?", c("Autosomal" = "NA",
+                                             "X chrom" = "23")),
                    ti_checkbox("Include in calculation?"))
