@@ -74,7 +74,7 @@ settings_tab <- tabPanel(
                    value = -1,
                    min = -1,
                    step = 1),
-      helpText("The exclusion power for markers with more than this many alleles will be obtained by simulation, as opposed to an exact calculation. Enter -1 or leave empty to never simulate."),
+      helpText("The exclusion power for markers with more than this many alleles will be obtained by simulation, as opposed to an exact calculation. Enter -1 or leave empty to never simulate. You can go back to the 'Markers' tab to check which markers will be simulated."),
       numericInput("nsims",
                    "Number of simulations",
                    value = 10,

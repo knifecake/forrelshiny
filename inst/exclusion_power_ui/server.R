@@ -145,7 +145,7 @@ shinyServer(function(input, output, session) {
                                nsim = input$nsims,
                                exactMaxL = simulation_threshold(),
                                verbose = TRUE)
-
+          print(unclass(ep))
           ep
         }, ms)
 
@@ -153,15 +153,23 @@ shinyServer(function(input, output, session) {
 
         ts <- Map(function(ep) { ep$time }, res)
 
+        sim <- Map(function(ep) {
+          if (ep$params$exactMaxL >= length(alleles(frequency_db(), ep$params$markers)))
+            "No"
+          else
+            "Yes"
+        }, res)
+
         data.frame("Marker" = ms,
                    "EP" = as.numeric(eps),
+                   "Simulated?" = as.character(sim),
                    "Time (s)" = as.numeric(ts),
                    check.names = FALSE)
       })
     })
   })
 
-  output$ep_results <- renderTable({ ep_results() })
+  output$ep_results <- renderTable({ ep_results() }, digits = 5)
 
   output$ep_results_total <- renderText({
     sprintf("Total EP: %f", 1 - prod(1 - ep_results()$EP, na.rm = TRUE))
