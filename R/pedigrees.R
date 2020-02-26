@@ -2,15 +2,14 @@
 #'
 #' @param x a \code{\link[pedtools]{ped}} object or a list of such
 #' @param available a list of individuals available for genotyping (will be red)
+#' @param genotyped a list of individuals that are genotyped (will be shaded)
 #'
 #' @seealso \code{\link[pedtools]{plotPedList}}
 #'
 #' @importFrom graphics plot
 #'
 #' @export
-custom_ped_plot <- function(x, available = c()) {
-  genotyped <- get_genotyped_ids(x)
-
+custom_ped_plot <- function(x, available = c(), genotyped = c()) {
   if (pedtools::is.pedList(x)) {
     plot_arg_list <- lapply(x, function(p) {
       list(x = p,

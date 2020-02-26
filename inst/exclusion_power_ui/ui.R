@@ -23,6 +23,8 @@ data_tab <- tabPanel(
     column(
       width = 4,
       tags$h4("Frequency database"),
+      textOutput("frequency_db_description"),
+      helpText("The frequency database determines which for which markers the exclusion power will be calculated. You may define it using one of the three options below."),
       fafreqs_widget_input(
         "frequency_db",
         allow_marker_filtering = FALSE,

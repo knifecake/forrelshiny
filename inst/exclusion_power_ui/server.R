@@ -55,11 +55,15 @@ shinyServer(function(input, output, session) {
 
   # Render pedigree plots
   output$ped_claim_plot <- renderPlot({
-    custom_ped_plot(ped_claim(), available = input$available_for_genotyping)
+    custom_ped_plot(ped_claim(),
+                    available = input$available_for_genotyping,
+                    genotyped = get_genotyped_ids(ped_claim()))
   })
 
   output$ped_true_plot <- renderPlot({
-    custom_ped_plot(ped_true(), available = input$available_for_genotyping)
+    custom_ped_plot(ped_true(),
+                    available = input$available_for_genotyping,
+                    genotyped = get_genotyped_ids(ped_claim()))
   })
 
   # Update individuals available for genotyping list
@@ -74,6 +78,19 @@ shinyServer(function(input, output, session) {
 
   # Load frequency database
   frequency_db <- callModule(fafreqs_widget, "frequency_db")
+
+  # Describe frequency database to help users
+  output$frequency_db_description <- renderText({
+    fdb <- frequency_db()
+    if (isTruthy(fdb)) {
+      ms <- markers(fdb)
+      sprintf("Frequency data loaded for %d markers: %s.",
+              length(markers(fdb)),
+              paste(markers(fdb), collapse = ", "))
+    } else {
+      "Please load frequency data."
+    }
+  })
 
   # Marker settings table
   marker_settings <- callModule(ti, "marker_settings", fields = mst_fields, data = data.frame())
