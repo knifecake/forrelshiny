@@ -37,6 +37,8 @@ data_tab <- tabPanel(
     column(
       width = 4,
       tags$h4("Reference data"),
+      textOutput("reference_data_description"),
+      helpText("Loading reference data will make the calculation conditional on it and thus faster."),
       fileInput("familias_reference_file",
                 "Load a familias case data file")
     ),

@@ -92,6 +92,19 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  # Describe reference data to help users
+  output$reference_data_description <- renderText({
+    gids <- get_genotyped_ids(ped_claim())
+
+    if (length(gids) > 0) {
+      sprintf("Reference data loaded for individuals %s.",
+              paste(gids, collapse = ", "))
+    } else {
+      "No reference data loaded."
+    }
+
+  })
+
   # Marker settings table
   marker_settings <- callModule(ti, "marker_settings", fields = mst_fields, data = data.frame())
 

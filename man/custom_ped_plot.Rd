@@ -4,12 +4,14 @@
 \alias{custom_ped_plot}
 \title{Plot a pedigree (list) for the forrel GUI}
 \usage{
-custom_ped_plot(x, available = c())
+custom_ped_plot(x, available = c(), genotyped = c())
 }
 \arguments{
 \item{x}{a \code{\link[pedtools]{ped}} object or a list of such}
 
 \item{available}{a list of individuals available for genotyping (will be red)}
+
+\item{genotyped}{a list of individuals that are genotyped (will be shaded)}
 }
 \description{
 Plot a pedigree (list) for the forrel GUI
