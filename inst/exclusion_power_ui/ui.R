@@ -86,7 +86,7 @@ settings_tab <- tabPanel(
 
 results_tab <- tabPanel(
   title = "Results",
-  actionButton("calculate_button", "Calculate"),
+  actionButton("calculate_button", "Calculate", class = "btn-primary"),
   verbatimTextOutput("ep_results_total"),
   tableOutput("ep_results")
 )

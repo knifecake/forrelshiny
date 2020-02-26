@@ -10,7 +10,9 @@ shinyServer(function(input, output, session) {
     p <- custom_read_ped(input$ped_claim_file$datapath)
 
     # attach allele frequencies
-    p <- custom_ped_set_markers(p, frequency_db())
+    p <- tryCatch(custom_ped_set_markers(p, normalise(frequency_db())),
+                  error = function(e) { NULL })
+    validate(need(!is.null(p), "Invalid frequency database."))
 
     # attach marker settings
     included_markers <- get_marker_names(p)
@@ -69,10 +71,16 @@ shinyServer(function(input, output, session) {
   # Update individuals available for genotyping list
   observe({
     req(ped_claim())
+    req(ped_true())
+
+    ids <- intersect(
+      custom_ped_labels(ped_claim()),
+      custom_ped_labels(ped_true())
+    )
 
     updateCheckboxGroupInput(session,
       "available_for_genotyping",
-      choices = custom_ped_labels(ped_claim()),
+      choices = ids,
       selected = input$available_for_genotyping
     )
   })
@@ -144,7 +152,6 @@ shinyServer(function(input, output, session) {
         eps <- Map(function(ep) { ep$EPtotal }, res)
 
         ts <- Map(function(ep) { ep$time }, res)
-        print(ts)
 
         data.frame("Marker" = ms,
                    "EP" = as.numeric(eps),
