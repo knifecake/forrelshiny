@@ -72,7 +72,8 @@ shinyServer(function(input, output, session) {
 
     updateCheckboxGroupInput(session,
       "available_for_genotyping",
-      choices = custom_ped_labels(ped_claim())
+      choices = custom_ped_labels(ped_claim()),
+      selected = input$available_for_genotyping
     )
   })
 
@@ -106,7 +107,9 @@ shinyServer(function(input, output, session) {
   })
 
   # Marker settings table
-  marker_settings <- callModule(ti, "marker_settings", fields = mst_fields, data = data.frame())
+  marker_settings <- callModule(ti, "marker_settings",
+                                fields = mst_fields,
+                                data = data.frame())
 
   # Simulation threshold
   simulation_threshold <- reactive({
@@ -115,6 +118,46 @@ shinyServer(function(input, output, session) {
     } else {
       Inf
     }
+  })
+
+  ep_results <- reactive({
+    if (input$calculate_button < 1) return(NULL)
+
+    isolate({
+      withProgress({
+        mst <- marker_settings()
+        ms <- get_marker_names(ped_claim())[mst[, "Include in calculation?"]]
+
+        res <- Map(function(m) {
+          incProgress(1/length(ms))
+          ep <- exclusionPower(ped_claim(),
+                               ped_true(),
+                               ids = input$available_for_genotyping,
+                               markers = m,
+                               nsim = input$nsims,
+                               exactMaxL = simulation_threshold(),
+                               verbose = TRUE)
+
+          ep
+        }, ms)
+
+        eps <- Map(function(ep) { ep$EPtotal }, res)
+
+        ts <- Map(function(ep) { ep$time }, res)
+        print(ts)
+
+        data.frame("Marker" = ms,
+                   "EP" = as.numeric(eps),
+                   "Time (s)" = as.numeric(ts),
+                   check.names = FALSE)
+      })
+    })
+  })
+
+  output$ep_results <- renderTable({ ep_results() })
+
+  output$ep_results_total <- renderText({
+    sprintf("Total EP: %f", 1 - prod(1 - ep_results()$EP, na.rm = TRUE))
   })
 })
 

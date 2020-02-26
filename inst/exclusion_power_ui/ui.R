@@ -85,7 +85,11 @@ settings_tab <- tabPanel(
 )
 
 results_tab <- tabPanel(
-  title = "Results")
+  title = "Results",
+  actionButton("calculate_button", "Calculate"),
+  verbatimTextOutput("ep_results_total"),
+  tableOutput("ep_results")
+)
 
 
 shinyUI(fluidPage(
