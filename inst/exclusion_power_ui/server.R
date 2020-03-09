@@ -22,7 +22,7 @@ shinyServer(function(input, output, session) {
     }))
 
     mst <- marker_settings()
-    if (isTruthy(mst) && is.data.frame(mst)) {
+    if (isTruthy(mst) && is.data.frame(mst) && length(mst) > 0) {
       p <- apply_marker_settings(p, mst)
 
       # save metadata not stored in pedigree for the next update
@@ -73,10 +73,14 @@ shinyServer(function(input, output, session) {
     req(ped_claim())
     req(ped_true())
 
+    # make sure IDs are on both pedigrees
     ids <- intersect(
       custom_ped_labels(ped_claim()),
       custom_ped_labels(ped_true())
     )
+
+    # remove genotyped individuals
+    ids <- setdiff(ids, get_genotyped_ids(ped_claim()))
 
     updateCheckboxGroupInput(session,
       "available_for_genotyping",
@@ -119,6 +123,20 @@ shinyServer(function(input, output, session) {
                                 fields = mst_fields,
                                 data = data.frame())
 
+  # Current marker settings table used for the calculation
+  current_mst <- reactive({
+    included_markers <- get_marker_names(ped_claim())
+    mutation_settings <- replicate(length(included_markers), "auto")
+    allele_counts <- unlist(lapply(fafreqs::markers(frequency_db()), function(m) {
+      length(fafreqs::alleles(frequency_db(), m))
+    }))
+    get_marker_settings_table(ped_claim(),
+                              included_markers,
+                              mutation_settings,
+                              allele_counts,
+                              simulation_threshold())
+  })
+
   # Simulation threshold
   simulation_threshold <- reactive({
     if (isTruthy(input$simulation_threshold) && input$simulation_threshold >= 0) {
@@ -133,7 +151,7 @@ shinyServer(function(input, output, session) {
 
     isolate({
       withProgress({
-        mst <- marker_settings()
+        mst <- current_mst()
         ms <- get_marker_names(ped_claim())[mst[, "Include in calculation?"]]
 
         res <- Map(function(m) {
@@ -144,7 +162,7 @@ shinyServer(function(input, output, session) {
                                markers = m,
                                nsim = input$nsims,
                                exactMaxL = simulation_threshold(),
-                               verbose = TRUE)
+                               verbose = FALSE)
           print(unclass(ep))
           ep
         }, ms)
