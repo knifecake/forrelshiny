@@ -163,7 +163,6 @@ shinyServer(function(input, output, session) {
                                nsim = input$nsims,
                                exactMaxL = simulation_threshold(),
                                verbose = FALSE)
-          print(unclass(ep))
           ep
         }, ms)
 
@@ -183,7 +182,8 @@ shinyServer(function(input, output, session) {
                    "Simulated?" = as.character(sim),
                    "Time (s)" = as.numeric(ts),
                    check.names = FALSE)
-      })
+      },
+      message = "Calculating exclusion power...")
     })
   })
 
