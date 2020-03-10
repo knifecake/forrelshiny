@@ -1,8 +1,17 @@
 library(shiny)
 library(gezellig)
 
+mst_fields <- list(ti_label("Marker"),
+                   ti_dropdown("Mutations", c("Auto" = "auto",
+                                              "On" = "on",
+                                              "Off" = "off")),
+                   ti_radio("Sex-linked?", c("Autosomal" = "NA",
+                                             "X chrom" = "23")),
+                   ti_checkbox("Include in calculation?"),
+                   ti_label("Comments"))
+
 # Define server logic required to draw a histogram
-shinyServer(function(input, output, session) {
+function(input, output, session) {
   # Load pedigrees
   ped_claim <- reactive({
     validate(need(input$ped_claim_file, "Please select a claim pedigree"))
@@ -146,16 +155,15 @@ shinyServer(function(input, output, session) {
     }
   })
 
-  ep_results <- reactive({
-    if (input$calculate_button < 1) return(NULL)
+  ep_results <- reactiveVal()
 
+  observeEvent(input$calculate_button, {
     isolate({
       withProgress({
         mst <- current_mst()
         ms <- get_marker_names(ped_claim())[mst[, "Include in calculation?"]]
 
         res <- Map(function(m) {
-          incProgress(1/length(ms))
           ep <- exclusionPower(ped_claim(),
                                ped_true(),
                                ids = input$available_for_genotyping,
@@ -163,6 +171,7 @@ shinyServer(function(input, output, session) {
                                nsim = input$nsims,
                                exactMaxL = simulation_threshold(),
                                verbose = FALSE)
+          incProgress(1/length(ms))
           ep
         }, ms)
 
@@ -177,11 +186,13 @@ shinyServer(function(input, output, session) {
             "Yes"
         }, res)
 
-        data.frame("Marker" = ms,
-                   "EP" = as.numeric(eps),
-                   "Simulated?" = as.character(sim),
-                   "Time (s)" = as.numeric(ts),
-                   check.names = FALSE)
+        res <- data.frame("Marker" = ms,
+                          "EP" = as.numeric(eps),
+                          "Simulated?" = as.character(sim),
+                          "Time (s)" = as.numeric(ts),
+                          check.names = FALSE)
+        # save to reactive values
+        ep_results(res)
       },
       message = "Calculating exclusion power...")
     })
@@ -192,13 +203,12 @@ shinyServer(function(input, output, session) {
   output$ep_results_total <- renderText({
     sprintf("Total EP: %f", 1 - prod(1 - ep_results()$EP, na.rm = TRUE))
   })
-})
 
-mst_fields <- list(ti_label("Marker"),
-                   ti_dropdown("Mutations", c("Auto" = "auto",
-                                              "On" = "on",
-                                              "Off" = "off")),
-                   ti_radio("Sex-linked?", c("Autosomal" = "NA",
-                                             "X chrom" = "23")),
-                   ti_checkbox("Include in calculation?"),
-                   ti_label("Comments"))
+  onBookmark(function(state) {
+    state$values$ep_results <- ep_results()
+  })
+
+  onRestore(function(state) {
+    ep_results(state$values$ep_results)
+  })
+}

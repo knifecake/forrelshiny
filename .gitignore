@@ -4,3 +4,4 @@
 .Ruserdata
 
 .DS_Store
+inst/exclusion_power_ui/shiny_bookmarks/
